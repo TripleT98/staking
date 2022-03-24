@@ -1,30 +1,28 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// When running the script with `npx hardhat run <script>` you'll find the Hardhat
-// Runtime Environment's members available in the global scope.
 import { ethers } from "hardhat";
 
 async function main() {
-  // Hardhat always runs the compile task when running scripts with its command
-  // line interface.
-  //
-  // If this script is run directly using `node` you may want to call compile
-  // manually to make sure everything is compiled
-  // await hre.run('compile');
+  let factory = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
+  let token1 = "0x053543EfB739A2E5e0B5c4853908E9a1B9EDf8C7";
+  let token2 = "0xc778417E063141139Fce010982780140Aa0cD5Ab";
+  const CreatePair = await ethers.getContractFactory("CreatePair");
+  const createPair = await CreatePair.deploy(token1,token2,factory);
+  await createPair.deployed();
+  console.log("CreatePair deployed to:", createPair.address);
+  /*const GetTokenNames = await ethers.getContractFactory("getTokenNames");
+  const getTokenNames = await GetTokenNames.deploy();
+  await getTokenNames.deployed();
+  console.log("GetTokenNames deployed to:", getTokenNames.address);*/
 
-  // We get the contract to deploy
-  const Greeter = await ethers.getContractFactory("Greeter");
-  const greeter = await Greeter.deploy("Hello, Hardhat!");
-
-  await greeter.deployed();
-
-  console.log("Greeter deployed to:", greeter.address);
+  /*const AddLiquidity = await ethers.getContractFactory("addLiquidity");
+  const addLiquidity = await AddLiquidity.deploy();
+  await addLiquidity.deployed();
+  console.log("addLiquidity deployed to:", addLiquidity.address);*/
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
+
+main().then((data) => {
+  process.exitCode = 0;
+}, (error)=>{
+  console.log(error);
   process.exitCode = 1;
 });
