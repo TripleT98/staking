@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./Routers/IUniswapV2Router02.sol";
+import "hardhat/console.sol";
 
 contract Staking{
 
@@ -42,22 +43,16 @@ contract Staking{
   function stake(uint _amount) external {
     IERC20(stakingToken).transferFrom(msg.sender, address(this), _amount);
 
-    Stakeholder memory stakeholder;
-
     if(!stakeholders[msg.sender].exist){
-      stakeholders[msg.sender] = stakeholder;
       stakeholders[msg.sender].exist = true;
-    }else{
-      stakeholder = stakeholders[msg.sender];
     }
 
-    stakeholder.timestamp = block.timestamp;
-    stakeholder.stake += _amount;
-    stakeholder.reward += (_amount/100)*rewardShare;
-
+    stakeholders[msg.sender].timestamp = block.timestamp;
+    stakeholders[msg.sender].stake += _amount;
+    stakeholders[msg.sender].reward += (_amount/100)*rewardShare;
   }
 
-  function getStakeholder(address _stakeholder) external returns(Stakeholder memory){
+  function getStakeholder(address _stakeholder) view external returns(Stakeholder memory){
     Stakeholder memory stakeholder = stakeholders[_stakeholder];
     return stakeholder;
   }
@@ -65,6 +60,7 @@ contract Staking{
   function _claim(Stakeholder storage _stakeholder, uint _amount) internal {
     require(block.timestamp - _stakeholder.timestamp >= rewardTime && _stakeholder.exist, "U have no reward tokens yet!");
     IERC20(rewardToken).transfer(msg.sender, _amount);
+    _stakeholder.reward -= _amount;
   }
 
   function claimAll() external {
@@ -75,6 +71,7 @@ contract Staking{
 
   function claim(uint _amount) external {
     Stakeholder storage stakeholder = stakeholders[msg.sender];
+    require(stakeholder.reward >= _amount, "You haven't such a big value of reward tokens");
     _claim(stakeholder, _amount);
   }
 
@@ -93,8 +90,6 @@ contract Staking{
   function _unstake(Stakeholder storage _stakeholder, uint _amount) internal {
     require(_stakeholder.stake >= _amount, "You have no such a big amount of stake tokens.");
     require(block.timestamp - _stakeholder.timestamp >= freezeTime, "U cant get back your reward tokens yet!");
-    uint lpTokenAmount = stakeholders[msg.sender].stake;
-    require(lpTokenAmount >= _amount, "Your LP tokens stake is not enough.");
     IERC20(stakingToken).transfer(msg.sender, _amount);
     _stakeholder.stake -= _amount;
   }
