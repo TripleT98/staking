@@ -4,6 +4,7 @@ let {unstakeTask} = require("./unstake.ts")
 let {getStakeholder} = require("./getStakeholder.ts")
 let {claimAllTask} = require("./claimAll.ts")
 let {unstakeAllTask} = require("./unstakeAll.ts")
+require("./anotherTasks.ts");
 
 claimTask();
 unstakeTask();
