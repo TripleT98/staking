@@ -33,6 +33,10 @@ contract Staking{
     bool exist;
   }
 
+  event Stake(address indexed stakeholder, uint amount, uint timestamp);
+  event Unstake(address indexed stakeholder, uint amount, uint remain);
+  event Claim(address indexed stakeholder, uint amount, uint remain);
+
   mapping (address=>Stakeholder) stakeholders;
 
   constructor(address _stakingToken, address _rewardToken) public {
@@ -50,6 +54,7 @@ contract Staking{
     stakeholders[msg.sender].timestamp = block.timestamp;
     stakeholders[msg.sender].stake += _amount;
     stakeholders[msg.sender].reward += (_amount/100)*rewardShare;
+    emit Stake(msg.sender, _amount, block.timestamp);
   }
 
   function getStakeholder(address _stakeholder) view external returns(Stakeholder memory){
@@ -61,6 +66,7 @@ contract Staking{
     require(block.timestamp - _stakeholder.timestamp >= rewardTime && _stakeholder.exist, "U have no reward tokens yet!");
     IERC20(rewardToken).transfer(msg.sender, _amount);
     _stakeholder.reward -= _amount;
+    emit Claim(msg.sender, _amount, _stakeholder.reward);
   }
 
   function claimAll() external {
@@ -92,6 +98,7 @@ contract Staking{
     require(block.timestamp - _stakeholder.timestamp >= freezeTime, "U cant get back your reward tokens yet!");
     IERC20(stakingToken).transfer(msg.sender, _amount);
     _stakeholder.stake -= _amount;
+    emit Unstake(msg.sender, _amount, _stakeholder.stake);
   }
 
 }

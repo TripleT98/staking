@@ -7,6 +7,7 @@ import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
 import Web3 from "web3";
+require("./tasks/task_root.ts");
 let {abi} = require("./artifacts/contracts/createPair.sol/CreatePair.json");
 let liq = require("./artifacts/contracts/addLiquidity.sol/addLiquidity.json");
 let uniswap = require("./artifacts/contracts/Routers/UniswapV2Router02.sol/UniswapV2Router02.json");
