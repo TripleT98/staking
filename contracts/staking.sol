@@ -45,6 +45,7 @@ contract Staking{
   }
 
   function stake(uint _amount) external {
+    require(IERC20(stakingToken).allowance(msg.sender, address(this)) >= _amount, "Error: Contract has no allowances to transfer this token amount from you!");
     IERC20(stakingToken).transferFrom(msg.sender, address(this), _amount);
 
     if(!stakeholders[msg.sender].exist){
